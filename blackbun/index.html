@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Guarida Burgers — Menú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">La Guarida <span>Burgers</span></div>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 <span class="cart-btn-label">Mi Pedido</span>
+    <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<!-- FAB mobile -->
+<button class="fab" onclick="toggleCart()" id="fab">
+  🛒 Ver pedido <span class="fab-count" id="fabCount">0</span>
+</button>
+
+<nav class="categories-nav" id="catNav">
+  <!-- generado dinámicamente -->
+</nav>
+
+<main id="mainContent">
+  <!-- LOADING STATE -->
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p>Cargando menú...</p>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="error-state" id="errorState" style="display:none">
+    <div class="error-icon">⚠️</div>
+    <p>No se pudo cargar el menú.<br>Revisá la conexión e intentá de nuevo.</p>
+    <button onclick="loadMenu()">Reintentar</button>
+  </div>
+
+  <!-- SECTIONS generadas dinámicamente -->
+  <div id="sectionsWrapper"></div>
+</main>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span id="modalTitle" class="modal-title"></span>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-img-wrap" id="modalImgWrap"></div>
+    <div class="modal-price" id="modalPrice"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+
+    <div class="option-group" id="sizeGroup">
+      <div class="option-label">! Agranda tu Burger !</div>
+      <div class="option-pills" id="sizePills"></div>
+    </div>
+
+    <div class="option-group" id="ingGroup">
+      <div class="option-label">Personalizar ingredientes</div>
+      <div class="option-pills" id="ingPills"></div>
+    </div>
+
+    <div class="option-group" id="sauceGroup">
+      <div class="option-label">Aderezos</div>
+      <div class="option-pills" id="saucePills"></div>
+    </div>
+
+<div class="option-group" id="extraGroup" style="display:none">
+  <div class="option-label">➕ Agregados</div>
+  <div class="option-pills" id="extraPills"></div>
+</div>
+
+    <div class="option-group">
+      <div class="option-label">Cantidad</div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-num" id="qtyNum">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+
+    <div class="option-group">
+      <div class="option-label">Nota adicional (opcional)</div>
+      <textarea class="notes-input" id="notesInput" placeholder="Ej: sin cebolla, bien cocida..."></textarea>
+    </div>
+
+    <button class="add-cart-btn" onclick="addToCart()">
+      Agregar al pedido — <span id="modalTotalPrice"></span>
+    </button>
+  </div>
+</div>
+
+<!-- CARRITO -->
+<div class="bg-overlay" id="bgOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <span class="cart-title">Tu Pedido</span>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <p>Tu pedido está vacío.<br>¡Elegí algo del menú!</p>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total estimado</span>
+      <span class="cart-total-val" id="cartTotal">$0</span>
+    </div>
+    <input class="name-input" id="customerName" type="text" placeholder="Tu nombre (para el pedido)" maxlength="40">
+    <input class="name-input" id="customerAddress" type="text" placeholder="📍 Dirección de entrega *" maxlength="120">
+    <button class="whatsapp-btn" id="waBtn" onclick="sendWhatsApp()">
+      <svg class="wa-icon" viewBox="0 0 32 32" fill="white">
+        <path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.832 4.584 2.236 6.348L4.5 28l6.852-1.717A11.94 11.94 0 0016 27c6.627 0 12-5.373 12-12S22.627 3 16 3zm6.406 16.594c-.266.747-1.558 1.43-2.14 1.497-.547.063-1.214.09-3.902-.812-3.266-1.1-5.36-4.39-5.524-4.593-.162-.202-1.326-1.76-1.326-3.358 0-1.596.836-2.38 1.134-2.706.297-.326.648-.408.864-.408.215 0 .431.002.62.01.2.01.468-.075.733.558.266.633.904 2.179.982 2.338.08.16.13.346.026.554-.106.209-.16.338-.317.52-.16.182-.335.406-.478.545-.16.156-.326.325-.14.638.188.313.832 1.37 1.785 2.22 1.226 1.09 2.26 1.43 2.573 1.59.314.16.496.133.68-.08.184-.21.788-.92 1-.237.21.315.84 1.567.925 1.725z"/>
+      </svg>
+      Enviar por WhatsApp
+    </button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
